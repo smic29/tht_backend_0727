@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :set_service, only: :test
+  before_action :set_service, only: :generate
 
   def generate
     if !params[:num] && !params[:format]
@@ -9,9 +9,17 @@ class TasksController < ApplicationController
 
     if is_valid_format?(params[:format])
       response = @service.task(params[:num].to_i, params[:format])
+
+      if params[:format] == 'console'
+        @response = response
+        puts "Data from App Brewery /random"
+        puts response
+        return
+      end
+
       respond_to do |format|
-        format.json { send_data response, filename: "taskjson-#{Date.today}.txt", type: 'text/txt; charset=UTF-8; header=present', disposition: 'attachment' }
-        format.csv { send_data response, filename: "taskcsv-#{Date.today}.csv", type: 'text/csv; charset=UTF-8; header=present', disposition: 'attachment' }
+        format.json { send_data response.to_json, filename: "task-#{Date.today}.json", type: 'application/json; charset=UTF-8', disposition: 'attachment' }
+        format.csv { send_data response, filename: "task-#{Date.today}.csv", type: 'text/csv; charset=UTF-8; header=present', disposition: 'attachment' }
       end
     end
   end

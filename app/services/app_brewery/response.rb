@@ -12,6 +12,7 @@ class AppBrewery::Response
   def data
     return parse_json_data(@raw_response) if @format == 'json'
     return parse_csv_data(@raw_response) if @format == 'csv'
+    return @raw_response.map {|data| data.body } if @format == 'console'
   end
 
   private
